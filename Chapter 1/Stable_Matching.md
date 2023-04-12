@@ -18,6 +18,13 @@
         - If *w* is also free, then they become engaged; otherwise, if *w* is already engaged to *m'*, then she determines which between *m* and *m'* is higher on her preference list and engages with them (the other is free)
     - The algorithm terminates when no one is free
 - ![Gale-Shapely Algorithm](../Images/Gale-Shapely.png)
+    - The algorithm can be implemented in O(n<sup>2</sup>) time using the proper data structures
+        - The set of free men should be maintained as a linked list, since there will often be cases where men will be added or removed from this set (and this operation should be done in constant time)
+        - The preference list of each man and woman should be an array of *n length* since specific indices will frequently be accessed
+            - Another array of *n length* should be maintained for each man, indicating the position of the *next* woman he will propose to on the list
+            - Yet another array of *n length* should be maintained for each woman, indicating her *current* partner
+        - In order to quickly determine for a woman, *w*, which of *m* or *m'* she prefers, an array of *n x n length* should be maintained, where element *[w, m]* contains the rank of man *m* in the sorted order of *w's* preferences (acts like a hash table for a man's ranking among a specific woman)
+            - Creating this array takes O(n<sup>2</sup>) time
 ## Algorithm Analysis
 - In this algorithm, a woman *w* receives better and better partners whereas a man *m* proposes to worse and worse women
 - The algorithm terminates after at most *n<sup>2</sup>* iterations in the possible case where each man proposes to a woman he has never proposed to before (*n* men, *n* women, so  *n<sup>2</sup>* possible cases) 
@@ -30,3 +37,15 @@
         - Contradiction: Assume that there is an instability within *(m, w)* and *(m', w')* such that *m* prefers *w'* and *w'* prefers *m*
             - If *m* did not propose to *w'* at some point in the algorithm, then it is implied that *w* occurs higher than *w'* on *m*'s preference list, which is a contradiction
             - Otherwise, if *m* did propose to *w'* at some point in the algorithm, then it is implied that he was rejected by *w'* in favor of another man *m''*, who was then replaced by *m'*, but this implies either that *m''* = *m'* or *w'* prefers *m'* to *m''*, both of which are contradictions
+## Extensions
+- In the version of the algorithm where *men propose to women*, there is a general "unfairness" towards women
+    - If all men list different women as their first choice, then there will be no rejections - meaning that the women effectively had no choice in their partners
+- All executions of the Gale-Shapely algorithm yield the same matching, which can be understood in the sense that each man *m* in the algorithm ends up with the *best valid partner*, *w* - that is, the highest ranked partner in which a stable matching *(m,w)* exists
+    - Thus, the Gale-Shapely algorithm yields a set *S\* = {(m, best(m)): m in M}*
+    - Suppose that, some execution E of the algorithm results in a matching set S in which some man is paired with a woman who is not his best valid partner
+        - Men propose in decreasing order of preference, implying that *m* was rejected by a valid partner earlier during execution - thus, the *first* valid partner *w* to reject *m* must be *m*'s best valid partner
+        - If *m* was rejected by *w*, then *w* is with some other man, *m'*, who she prefers to *m*
+        - Since *w* is a valid partner of *m*, *(m, w)* is a stable matching
+            - If *(m, w)* is a stable matching, assume that *m'* is matched with some other woman, *w'*
+            - In the execution of the algorithm, *m'* clearly prefers *w* to *w'* since he matched with her, but *w'* also prefers *m'* to *m* since the latter was rejected - this is an instability in S', which is a contradiction since the Gale-Shapely algorithm always provides a stable matching
+            - Thus, every execution must return the same set *S\** in which each man is paired with his best valid partner and each woman is paired with her worst valid partner
