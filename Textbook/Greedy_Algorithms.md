@@ -112,3 +112,30 @@
         - The other edges of *C* form a path *P* with one end at *v* and the other at *w*, so some other edge *e'* can be used to cross from *S* to *V - S*, and since *e* is the most expensive edge on the cycle *C*, it is the case that *e'* is cheaper than *e* and therefore forms a cheaper spanning tree
     - The Reverse-Delete algorithm always removes edges that lies on a cycle *C*, and since it deletes in decreasing order of cost, it is always deleting the msot expensive edge, which agrees with the cycle property
         - The algorithm will never disconnect the graph and, by definition, ensures that no cycles remain
+## Union-Find Data Structure
+- The **Union-Find** data structure initially maintains disjoint sets and supports the `Find(u)` operation, which returns the name of the set containing *u*, the `Union(A, B)` operation, which merges *A* and *B* into the same set, and the `MakeUnionFind(S)` operation, which initializes the data structure by initially placing all elements in separate sets
+    - If two nodes, *u* and *v*, are part of the same set, then `Find(u) = Find(v)`
+- One implementation utilizes an array `Component`, which contains the name of the set currently containing each element - in other words, `Component[s]` is the name of the set containing *s*; another structure (perhaps an array of linked lists) should also maintain the list of elements in each set, so that the elements of the two sets merged during a `Union` can be referenced readily 
+    - The `MakeUnionFind` operation will initialize the array such that `Component[s] = s`; this takes *O(n)*
+    - Any `Find` operation is done in *O(1)* time since it is a simple lookup
+    - For a `Union` operation, an optimization can be made by maintaining a `size` such that the size of a set *A* can be found via `size[A]`
+        - Whenever `Union(A, B)` is performed, the name of the larger set of is used for the union (this means that less updates are performed since only the elements of the smaller set must be updated)
+        - The absolute worst case for `Union` with this implementation is *O(n)*, in the case where the `Union` operation is taken on two large sets
+        - It can be shown that any sequence of *k* `Union` operations takes at most *O(klogk)* time:
+            - Initially `Union` operations are performed on one-element sets, and a sequence of *k* `Union` operations will consider at most *2k* elements of *S* (since it considers two sets)
+            - Given this, and the fact that the union uses the name of the larger set, consider an element *v* that is part of a set that grows to this maximum size of *2k*
+                - The size of *v*'s set starts at 1, and at least doubles during each update until it reaches *2k* - thus, `Component[v]` gets updated at most *log<sub>2</sub>(2k)* times 
+            - Since at most *2k* elements are involved in any of the *k* `Union` operations at all, the total bound is *O(klogk)*
+- Another, better implementation utilizes pointers instead of arrays - each node *v* in *S* has a pointer to the name of the set that contains *v*
+    - ![Union-Find Pointers](../Images/Union_Find_Pointers.png)
+    - The `MakeUnionFind` operation still performs similarly in that it initializes each node with a pointer (either to itself or to null)
+    - A `Union` operation for two sets, *A* and *B*, represented by nodes *v* and *u* respectively, sets the smaller set's node (say *u*) pointer to point to the larger set's node (say *v*); this allows for the `Union` operation to run in *O(1)* time 
+    - A `Find` operation must follow a sequence of pointers through the history of old names in order to get to the current name
+        - The `Find` operation takes *O(logn)* time - the time for `Find(v)` is the number of times the set containing *v* changes size
+            - Since *v*'s set at least doubles during each change and can only reach a maximum size of *n*, its size can double at most log<sub>n</sub> times
+    - An optimization that can be made with the `Find` operation is, after finding the name *x* of the set containing *v* during a `Find(v)` operation, all elements that were on the "path" of pointers to get to *x* can be updated to simply just point to *x* - this *compresses* the path
+        - The call to `Find` in which the compression occurs will still take *O(logn)* time, but subsequent calls to `Find` will be made cheaper
+        - ![Union Find Compression](../Images/Union_Find_Compression.png)
+- The Union-Find data structure can be used for the implementation of Kruskal's Algorithm by maintaining the structure for the set of nodes on the graph
+    - When an edge *e = (v, w)* is considered, it can be checked that adding the edge does not form a cycle by checking that `Find(v)` is not equal to `Find(w)` - if they were equal, *v* and *w* belong to the same connected component on the graph and including the edge would result in a cycle
+    - With this approach, a total of at most *2m* `Find` operations  and *n - 1* `Union` operations are performed, which results in a runtime of *O(mlogn)*
