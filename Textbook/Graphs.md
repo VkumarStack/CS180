@@ -24,3 +24,11 @@
     - Its neighbors must therefore be assigned *blue*, and their neighbors must be assigned *red* - this is done until the whole graph is colored
     - If every edge has ends of opposite colors, then the graph is bipartite - otherwise, it is not
     - The algorithm can do this coloring on top of breadth-first search, by associating a color with each layer (i.e. red for even indexed layers and blue for odd indexed layers) and, after the search completes, scanning all edges to determine if there are any edges in which both ends have the same color
+## Connectivity in Directed Graphs
+- For directed graphs, breadth-first search and depth-first search can still be used, but now it will return the set of nodes reachable from *s* - it could be the case that there is a path to *t* from *s* but not a path to *s* from *t*
+    - To find the set of nodes with paths *to s*, a new directed graph *G<sup>rev</sup>* can be defined such that every edge direction is reversed
+        - Running breadth-first search or depth-first search starting from *s* yields the set nodes that has a path *to s* in *G* (the original graph)
+- A directed graph is **strongly connected** if, for every two nodes *u* and *v*, there is a path from *u* to *v* and a path from *v* to *u* - that is, they are *mutually reachable*
+    - Reachability is transitive, so if *u* and *v* are mutually reachable, and *v* and *w* are mutually reachable, then *u* and *w* are mutually reachable
+- To determine the *strong component* of a directed graph, run a traversal algorithm (BFS or DFS) on the graph *G* and the reversed version of the graph *G<sup>rev</sup>* - the set of nodes reached by *both* traversals is the strong component
+    - For any two nodes *s* and *t* in a directed graph, their strong components are either identical or disjoint
