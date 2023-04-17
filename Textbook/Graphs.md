@@ -32,3 +32,12 @@
     - Reachability is transitive, so if *u* and *v* are mutually reachable, and *v* and *w* are mutually reachable, then *u* and *w* are mutually reachable
 - To determine the *strong component* of a directed graph, run a traversal algorithm (BFS or DFS) on the graph *G* and the reversed version of the graph *G<sup>rev</sup>* - the set of nodes reached by *both* traversals is the strong component
     - For any two nodes *s* and *t* in a directed graph, their strong components are either identical or disjoint
+## Directed Acyclic Graphs and Topological Ordering
+- A **directed acyclic graph (DAG)** is a directed graph that contains no cycles
+- It is common to try to determine a **topological ordering** of a DAG *G*, which is an ordering of nodes *v<sub>1</sub>*, *v<sub>2</sub>*, ..., *v<sub>n</sub>* so that for every edge *(v<sub>i</sub>, v<sub>j</sub>)*, *i < j*
+    - ![Topological Ordering](../Images/Topological_Ordering.png)
+- A topological ordering is often relevant when trying to establish precedence for a directed graph structure - i.e. course prerequisites or resource dependencies
+- If a graph *G* has a topological ordering, then it is a directed acyclic graph and vice-versa
+- ![Topological Ordering Algorithm](../Images/Topological_Ordering_Algorithm.png)
+    - An alternative way to compute the topological ordering of a set of nodes is to run a *depth-first search* and add nodes to the returned ordering after they have been fully explored
+        - ![Topological Ordering DFS](../Images/Topological_Ordering_DFS.png)
