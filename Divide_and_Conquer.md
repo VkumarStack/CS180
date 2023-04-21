@@ -1,0 +1,41 @@
+# Divide and Conquer
+- **Divide-and-conquer** refers to algorithmic techniques where a problem is broken into several parts, and each problem is solved recursively and then combined with other solutions into an overall solution
+- The runtime of divide-and-conquer can often be found by solving a recurrence relation associated with the algorithm
+## Mergesort
+- The mergesort algorithm sorts a list by dividing it into two equal halves, sorting each half recursively, and then combining the results of each recursive call
+- The algorithm spends *O(n)* time to divide the input into two pieces of size *n/2*, then spends *T(n/2)* to solve each half, and finally spends *O(n)* time to combine the two solutions
+    - *T(n) <= 2T(n/2) + O(n) = 2T(n/2) + cn*
+        - *T(2) <= c* 
+- One approach to solving recurrences is to *unroll* the recursion and determine some sort of pattern
+    - ![Mergesort Unroll](./Images/Mergesort_Unroll.png)
+    - At level *j* of the recursion, the number of subproblems has doubled *j* times for a total of *2<sup>j</sup>*, but each problem has also correspondingly shrunk by a factor of *2<sup>j</sup>* for a size of *n/2<sup>j</sup>*
+        - Thus, each level *j* contributes a total of at most *(2<sup>j</sup>)(cn/2<sup>j</sup>) = cn* running time 
+        - At each level there is *cn* work, and the number of levels of recursion is simply *log<sub>2</sub>n* (since the input is getting halved each time) and therefore the running time is *O(nlogn)*
+- Another approach to solving recurrences is to *guess* a running time and verify it by plugging it into the recurrence relation
+    - For the mergesort algorithm, guess that *T(n) <= cnlog<sub>2</sub>n* for *n >= 2*
+        - This holds for the base case of *n = 2* since *c(2)log<sub>2</sub>2 = 2c* and *T(2) <= c* (so *c <= 2c*, which holds)
+        - Assuming *T(m) <= cmlog<sub>2</sub>m* holdsfor *m < n*, it just needs to be proven for *n*
+            - *T(n) <= 2T(n/2) + cn*
+            - *T(n) <= 2c(n/2)log<sub>2</sub>(n/2) + cn*
+            - *T(n) <= cn(log<sub>2</sub>n - 1) + cn*
+            - *T(n) <= cn(log<sub>2</sub>n)*
+## Further Recurrence Relations
+- Consider more general divide-and-conquer algorithms that create recursive calls on *q* subproblems of size *n/2* and combine the results in *O(n)* time
+    - *T(n) <= qT(n/2) + cn*
+        - *T(2) <= c*
+- Case of *q > 2*:
+    - The bound is *O(n<sup>log<sub>2</sub>q</sup>)*
+- Case of *q = 2*:
+    - The bound is *O(nlogn)* (proven earlier)
+- Case of *q = 1*:
+    - The bound is *O(n)*
+## Counting Inversions
+- Consider the problem of counting the *number of inversions* in a sequence
+    - i.e. For [2, 4, 1, 3, 5], there are three inversions: (2, 1), (4, 1), and (4, 3)
+- This problem can be brute-forced by looking at every single pair of numbers in the sequence, taking *O(n<sup>2</sup>)* time
+- A more efficient, *O(nlogn)* solution can be found using divide-and-conquer
+    - The list can be divided into two pieces and the number of inversions *within each individual half* can be found and then added to the number of inversions *between each half*
+    - ![Inversion Count](./Images/Inversion_Count.png)
+    - ![Sort and Count](./Images/Sort_and_Count.png)
+        - In the merge step, if *B*'s current element *b<sub>j</sub>* is less than *A*'s current element *a<sub>i</sub>*, then it is clear that *b<sub>j</sub>* is also less than the rest of *A*'s elements (*a<sub>i</sub>* to *a<sub>n</sub>*) since *A* is sorted
+            - This means that there are as many inversions as there are remaining elements in *A*
