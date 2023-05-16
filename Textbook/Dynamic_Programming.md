@@ -85,3 +85,26 @@
     - The runtime is therefore *O(nW)*
 - The Knapsack Problem is an extension to the Subset Sum Problem, where each item *i* has a nonnegative weight *w<sub>i</sub>* but also a value *v<sub>i</sub>* - the goal now is to find a subset of maximum value with the restriction that the weight does not exceed *W*
     - *`OPT(i, w)` = max(`OPT(i-1, w)`, v<sub>i</sub> + `OPT(i-1, w-w[i])`)*
+## Shortest Paths in a Graph
+- Dijkstra's Algorithm does not work for graphs with negative weight edges 
+    - The algorithm does not account for the case where a path may initially be more expensive but then much more cheaper than other paths once a large negative weight is encountered
+- An algorithm that *can* find the shortest path for a graph with negative weight edges is the **Bellman-Ford Algorithm**, which utilizes dynamic programming approach 
+    - If the graph *G* has no negative cycles, then the shortest path from node *s* to *t* can have at most *n - 1* edges
+    - Using this observation, the sub-problem of finding the shortest path using at most *i* edges, where *i <= n - 1*, can be used to construct a larger solution for finding the shortest path using at most *n - 1* edges
+- If the optimal path *P* using at most *i* edges from node *v* to *t* can be represented as *`OPT(i, v)`*, then:
+    - If path *P* uses at most *i - 1* edges, then `OPT(i, v) = OPT(i - 1, v)`
+    - If path *P* uses *i* edges, and its **first** edge is *(v, w)*, then `OPT(i, v) = c(vw) + OPT(i - 1, w)`
+    - *`OPT(i, v)` = min(`OPT(i - 1, v)`, min<sub>w in V</sub>(`OPT(i - 1, w)` + c(vw)))*
+- Example:
+    - ![Bellman-Ford Example](../Images/Bellman-Ford_Example.png)
+    - At each *i*, each node *v*'s *outgoing neighbors* are considered and, if there is a neighbor *w* such that the shortest path to *w* plus the cost of the edge *vw* is less than *v*'s current shortest path, *v*'s shortest path is updated
+- ![Bellman-Ford Algorithm](../Images/Bellman-Ford.png)
+    - The algorithm has a running time of *O(mn)*
+    - An improvement can be made to this implementation where an array *M* of size *n* is instead used, where *M[v]* stores the length of the shortest path from *v* to *t* found so far
+    - To actually *recover* the shortest path after the algorithm terminates, each node should maintain a variable storing the first node after itself on the path to *t*
+        - Whenever *M[v]* is updated, *first[v]* should be correspondingly updated to point to the node *w* that updated its shortest path
+- The Bellman-Ford Algorithm can be used in distributed systems, such as communication networks, to find the shortest path using only *local knowledge*
+    - Whenever a node (say a router) has its shortest path updated, it sends out an message to all of its neighbors, which then determine if their shortest path is updated using the information (and if it is, send an update to all of *their* neighbors)
+        - ![Asynchronous Shortest Path](../Images/Asynchronous_Shortest_Path.png)
+    - This approach, known as the **Distance Vector Protocol**, works if the edge weights *do not change*, but is prone to failure otherwise - especially in the case where edges may be deleted
+        - Network routing schemes tend to instead use **Path Vector Protocols**, where each node stores not just the distance and the first node to the shortest path, but also a representation of the entire path

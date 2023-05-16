@@ -1,0 +1,55 @@
+# NP and Computational Intractability
+## Polynomial-Time Reductions
+- When considering extremely hard computational problems, the notion of a **reduction** is useful to compare the relative difficulty of problems
+- Consider problems *X* and *Y*, and suppose that there exists a **black box** that could solve instances of *X* in a single step
+    - If arbitrary instances of *Y* could be solved in a polynomial number of standard computational steps and a polynomial number of calls to the black box for *X*, then *Y is polynomial-time reducible to X*
+        - *Y ≤<sub>P</sub> X*
+        - This implies that if there does exist a polynomial-time algorithm that solves *X*, then, by extension, there is also a polynomial-time algorithm time algorithm to solve *Y*
+- If *Y ≤<sub>P</sub> X*, then if *Y* cannot be solved in polynomial time, then *X* also cannot be solved in polynomial time
+### Independent Set and Vertex Cover
+- In a graph *G = (V, E)*, a set of nodes *S ⊆ V* is independent if no two nodes in *S* are joined by an edge; the **Independent Set Problem** involves finding a large enough independent set in *G*
+    - **Optimization version**: Find the maximum size of an independent set for *G*
+        - Given a solution to the optimization version, the decision version can be solved 
+    - **Decision version**: Determine whether or not (yes or no) *G* has an independent set of size at least *k*
+        - Given a solution to the decision version, the optimization version can be solved (binary search for each *k* until the largest *k* is found)
+    - ![Independent Set](../Images/Independent_Set_Vertex_Cover.png)
+        - Largest independent set: {1, 4, 5, 6}
+- In a graph *G = (V, E)*, a set of nodes *S ⊆ V* is a vertex cover if every edge *e in E* has at least one end in *S*; the **Vertex Cover Problem** also has a optimization and decision version akin to the Independent Set Problem, except now the goal is to get as small as a vertex cover as possible
+    - ![Independent Set](../Images/Independent_Set_Vertex_Cover.png)
+        - Smallest Vertex Cover: {2, 3, 7}
+- It can be shown that the Independent Set Problem reduces into the Vertex Cover Problem and vice-versa: A set *S* is an independent set if and only if its complement *V - S* is a vertex cover
+    - If *S* is an independent set, then an arbitrary edge *e = (u, v)* cannot both be in *S*, so one of them must be in *V - S*; this argument can be applied to every edge, implying that *V - S* is a vertex cover
+        - A black box that solves the Decision Independent Set Problem can solve the Vertex Cover Problem by deciding whether *G* has an independent set of size at least *n - k*
+    - If *V - S* is a vertex cover, then two nodes *u* and *v* in *S* cannot be joined by an edge *e* because neither of them would be in *V - S*, contradicting that it is a vertex cover - so *S* must be an independent set
+        - A black box that solves the Decision Vertex Cover Problem can solve the Independent Set Problem by deciding whether *G* has a vertex cover of size at most *n - k*
+### Set Cover and Set Packing
+- A more general version of the Vertex Cover Problem is the Set Cover Problem: *Given a set U of n elements, a collection S<sub>1</sub>, ..., S<sub>m</sub> of subsets U, and a number k, does there exist a collection of at most k of these sets whose union is equal to U?*
+    - ![Set Cover](../Images/Set_Cover.png)
+    - The Vertex Cover Problem reduces to the Set Cover Problem: A black box that can solve the Set Cover Problem can be used to solve the Vertex Cover Problem
+        - The set *U* is equal to *E* in the context of the graph, and each time a vertex *i* is chosen, all edges incident to it are added to a set *S<sub>i</sub>*
+        - If sets *S<sub>i1</sub> ..., S<sub>il</sub>*, where *l <= k*, cover *U*, then every edge in *G* is incident to one of the vertices *i1, ..., il*, so the set of such vertices is a vertex cover in *G* of size *l <= k*
+- A more general version of of the Independent Set Problem is the Set Packing Problem: *Given a set U of n elements, a collection S<sub>1</sub>, ..., S<sub>m</sub> of subsets U, and a number k, does there exist a collection of least k of these sets with the property that no two of them intersect?*
+    - The reduction can be perofmred in the same way as the Vertex Cover Problem to Set Cover Problem
+## Reduction via "Gadgets": The Satisfiability Problem
+- Given a set *X* of *n Boolean variables x<sub>1</sub>, ..., x<sub>n</sub>*, a *term* over *X* is one of these variables *x<sub>i</sub>* or its negation *x̄<sub>i</sub>*, and a *clause* of length *l* is a disjunction (an **OR**) of *l* distinct terms
+    - *t<sub>1</sub> ∨ t<sub>2</sub> ∨ ... ∨ t<sub>l</sub>*
+- A truth assignment is a mapping of false (0) or true (1) to each *x<sub>i</sub>*; this means that *x̄<sub>i</sub>* has the *opposite* truth value of *x<sub>i</sub>*
+    - An assignment *satisfies* a clause *C* if it causes *C* to evaluate to true, and an assignment satisfies a collection of clauses *C<sub>1</sub>, ... , C<sub>k</sub>* if it causes all clauses to evaluate to true (an **AND**)
+        - *C<sub>1</sub> ∧ C<sub>2</sub> ∧ ... ∧ C<sub>k</sub>*
+- The **Satisfiability Problem (SAT)**, another computationally hard problem, asks, *given a set of clauses C<sub>1</sub>, ..., C<sub>k</sub> over a set of variables X = {x<sub>1</sub>, ..., x<sub>n</sub>}, does there exist a satisfying truth assignment?*
+    - The **3-SAT Problem** is concerned with clauses of length three
+- It can be shown that the 3-SAT Problem can be reduced to the Independent Set Problem
+    - This can be done by constructing a graph *G* consisting of *3k* nodes grouped into *k* triangles connected by edges such that a vertex *v<sub>ij</sub>* is the *j<sup>th</sup>* terms from clause *C<sub>i</sub>*
+        - Additional edges are added for vertices whose labels correspond to terms that conflict (so the nodes corresponding to *x<sub>i</sub>* would form an edge with the nodes corresponding to *x̄<sub>i</sub>*)
+        - ![Independent Set SAT](../Images/Independent_Set_SAT.png)
+    - If this resulting graph *G* possessed an independent set of size at least *k*, then the 3-SAT instance is satisfiable
+        - If size of *S* is exactly *k*, it must consist of one node from each triangle (multiple nodes in the same triangle would imply that the set is not independent)
+        - If one node in *S* were labeled *x<sub>i</sub>* and another were labeled *x̄<sub>i</sub>*, then this would be a contradiction because there is an edge between the two nodes so *S* would not be independent
+            - Only one of the two can appear as a label in *S*; if only *x<sub>i</sub>* appears, it should be set to true and otherwise only if *x̄<sub>i</sub>* appears it should be set to false
+            - Labels that don't appear in *S* can be arbitrarily set to true
+        - In this way, it is ensured that all labels of nodes in *S* evaluate to 1, thus implying satisfiability
+    - If the 3-SAT instance is satisfiable, then the resulting graph *G* has an independent set of size at least *k*
+        - *S* must have one node from each triangle, and if there were an edge between two nodes *u, v* in *S*, then this would imply that their labels would have to conflict (since *u* and *v* cannot be from the same triangle), but this would contradict satisfiability since they must both evaluate to true
+- Reductions are transitive, so:
+    - *3-SAT ≤<sub>P</sub> Independent Set ≤<sub>P</sub> Vertex Cover ≤<sub>P</sub> Set Cover*
+    - *3-SAT ≤<sub>P</sub> Set Cover*
