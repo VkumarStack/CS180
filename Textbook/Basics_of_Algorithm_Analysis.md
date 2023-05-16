@@ -18,7 +18,7 @@
     - Representing heaps via arrays keeps it balanced at all times
         - **leftChild(i) = 2i + 1** (zero index)
         - **rightChild(i) = 2i + 2** (zero index)
-        - **parent(i) = floor(i/2)** 
+        - **parent(i) = floor((i-1)/2)** 
     - ![Heap](../Images/Heap.png)
 - Heap operations such as insertion and deletion can be performed in *O(log(n))* time
     - During an insertion, the element is added to the end of the array and then repeatedly swapped with its parent until the heap property is once again maintained
