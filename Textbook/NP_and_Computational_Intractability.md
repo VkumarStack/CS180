@@ -53,3 +53,53 @@
 - Reductions are transitive, so:
     - *3-SAT ≤<sub>P</sub> Independent Set ≤<sub>P</sub> Vertex Cover ≤<sub>P</sub> Set Cover*
     - *3-SAT ≤<sub>P</sub> Set Cover*
+## Efficient Certification and the Definition of NP
+- For problems such as Independent Set and 3-SAT, it is hard to find polynomial-time algorithms to *solve* them; however, there are polynomial-time algorithms to *check* a proposed solution
+    - For Independent Set, simply check that that no vertices in the proposed solution set have edges with each other
+    - For 3-SAT, simply evaluate the clauses with respect to a proposed assignment of values to the terms
+### Problems and Algorithms
+- Consider the input, which can be encoded as a binary string *s* with length *|s|*, to a **decision problem**, represented by a set of strings *X* on which the answer is "yes"
+    - An algorithm *A* for the decision problem *solves* *X* if, for all strings *s*, *A(s) = yes* if and only if *s* is in *X*
+        - *A* has a *polynomial running time* if there is a polynomial function *p()* such that for every *s*, *A* is bounded by *O(p(|s|))*
+        - 𝒫 is the set of all problems *X* for which there exists an algorithm *A* with polynomial running time that solves *X*
+### Efficient Certification
+- An algorithm *B* is an *efficient certifier* for a problem *X* if it is a polynomial-time algorithm that takes the problem input *s* and a certificate string *t* and there is a polynomial function *p* so that for every string *s*, *s* is in *X* if and only if there exists a string *t* such that *|t| <= p(s)* and *B(s, t)*
+    - *B* effectively tries to evaluate the proof *t* that *s* belongs to *X*, as long as *t* is not too long 
+### NP: A Class of Problems
+- 𝒩𝒫 is the set of all problems for which an efficient certifier exists, and it can be observed that **𝒫 ⊆ 𝒩𝒫**, since, if a polynomial-time algorithm to solve a problem exists, the certifier can simply output the result of that algorithm
+- Although many computationally hard problems, such as 3-SAT, Independent Set, and Set Cover, belong to 𝒩𝒫, there is no current proof that a problem in 𝒩𝒫 does not belong to 𝒫
+    - The question of 𝒫 = 𝒩𝒫 is unknown, but is generally believed to be not true
+## NP-Complete Problems
+- A problem *X* is **NP-Complete** if (i) *X ∈ 𝒩𝒫* and (ii) for all *Y ∈ 𝒩𝒫*, Y ≤<sub>p</sub> X
+    - If *X* is an NP-Complete problem, then it is solvable in polynomial time if and only if 𝒫 = 𝒩𝒫
+        - If *X* can be solved in polynomial time, then any other 𝒩𝒫 problem *Y* can be reduced to *X* and then solved in polynomial time as well
+- To show that a problem is NP-Complete, it must be shown that the problem can encode *any* problem in 𝒩𝒫
+- One example of a problem in 𝒩𝒫 is the **Circuit Satisfiability Problem**
+    - Consider a circuit built out of gates implementing the standard boolean operations: ∧ (AND), ∨ (OR), and ¬ (NOT)
+    - The circuit *K* is a directed acyclic graph where the *sources* are labeled with a constant boolean value (0 or 1) or a distinct variable (*inputs*), and every other nodes are labeled with boolean operators (directed either one node for NOT or two nodes for AND or OR)
+    - The problem seeks, given a circuit *K*, whether there is an assignment to the inputs such that the circuit outputs true (1)
+    - ![Circuit Satisfiability](../Images/Circuit_Satisfiability.png)
+        - The circuit is satisfiable if the inputs (three on the bottom right) are 1, 0, and 1
+- It has been shown that Circuit Satisfiability is NP-Complete, which can be intuitively justified by the fact that any algorithm that takes a fixed number of bits and produces a yes or no output can be represented as a circuit
+    - The number of steps the algorithm takes is the size of the circuit (so a polynomial time algorithm corresponds to a polynomial size circuit)
+    - To show that *X ≤<sub>p</sub> Circuit Satisfiability*, consider a black box that can solve Circuit Satisfiability
+        - Since *X* is assumed to be in 𝒩𝒫, it is known to have an efficient certifier *B*, which is a *polynomial-time algorithm*
+        - *B* can be converted into a polynomial-size circuit with the first *n* sources being hard-coded with the values of the input to *X*, *s*, and the remaining *p(n)* sources being inputs labeled with the bits representing *t*, the certifier
+        - With this setup, *s ∈ X* if and only if there is a way to set the input bits to satisfy the circuit
+        - Example Circuit: Given a graph *G*, does it contain a two-node independent set?
+            - ![Circuit Satisfiability Independent Set](../Images/Circuit_Satisfiability_Independent_Set.png)
+            - This circuit represents a graph of three nodes, *u, v, and w*, where *v* has an edge with both *u* and *w*
+- If *Y* is an NP-Complete problem, and *X* is a problem in 𝒩𝒫 with the property that *Y* ≤<sub>p</sub> *X*, then *X* is NP-Complete
+- It can be shown that 3-SAT is NP-Complete by showing that Circuit Satisfiability can be reduced to 3-SAT 
+    - Construction of Circuit:
+        - If a node *v* in the circuit is ¬ and its entering edge is *u*, then it needs to be the case that *x<sub>v</sub> = x̄<sub>u</sub>*, which can be guaranteed by adding the clauses *(x<sub>v</sub> ∨ x<sub>u</sub>)* and *(x̄<sub>v</sub> ∨ x̄<sub>u</sub>)*
+        - If a node *v* in the circuit is ∨ and its two entering edges are *u* and *w*, then it needs to be the case that *x<sub>v</sub> = x<sub>u</sub> ∨ x<sub>v</sub>*, which can be guaranteed by adding the clauses  *(x<sub>v</sub> ∨ x̄<sub>u</sub>)*, *(x<sub>v</sub> ∨ x̄<sub>w</sub>)*, and *(x̄<sub>v</sub> ∨ x<sub>u</sub> ∨ x<sub>w</sub>)*
+        - If a node *v* in the circuit is ∧ and its two entering edges are *u* and *w*, then it needs to be the case that *x<sub>v</sub> = x<sub>u</sub> ∧ x<sub>v</sub>*, which can be guaranteed by adding the clauses  *(x̄<sub>v</sub> ∨ x<sub>u</sub>)*, *(x̄<sub>v</sub> ∨ x<sub>w</sub>)*, and *(x<sub>v</sub> ∨ x̄<sub>u</sub> ∨ x̄<sub>w</sub>)*
+        - For sources that have a constant value, a single-variable clause of *x<sub>v</sub>* or *x̄<sub>v</sub>* can be added to force the designated value, and for the output node *o*, a single-variable clause of *x<sub>o</sub>* can be added (requiring that *o* be 1)
+    - If the given circuit *K* is satisfiable, then the satisfying assignments to the circuit inputs can be used to evaluate *all* nodes in the circuit, which can act as a solution to the constructed SAT instance
+        - If the SAT instance constructed is satisfiable, then the values corresponding to the input variables of the circuit *K* can be used to satisfy *K*
+    - The resulting *SAT* instance is not necessarily *3-SAT*, as some clauses possess only 1 or 2 terms
+        - Clauses can be "extended" by adding four new terms *z<sub>1</sub>*, *z<sub>2</sub>*, *z<sub>3</sub>*, and *z<sub>4</sub>* such that *z<sub>1</sub> = z<sub>2</sub> = 0*
+            - Add *(z̄<sub>i</sub> ∨ z<sub>3</sub> ∨ z<sub>4</sub>)*, *(z̄<sub>i</sub> ∨ z̄<sub>3</sub> ∨ z<sub>4</sub>)*, *(z̄<sub>i</sub> ∨ z<sub>3</sub> ∨ z̄<sub>4</sub>)*, and *(z̄<sub>i</sub> ∨ z̄<sub>3</sub> ∨ z̄<sub>4</sub>)* for *i = 1* and *i = 2*, which ensures that *z<sub>1</sub> = z<sub>2</sub> = 0* as otherwise all the clauses would not be satisfied
+            - Clauses with only one term can have *z<sub>1</sub>* and *z<sub>2</sub>* added whereas clauses with two terms can have just *z<sub>1</sub>* added
+    - Since *Circuit Satisfiability* can be reduced *3-SAT*, and *3-SAT* can be reduced into *Independent Set*, which can be reduced into *Vertex Cover*, which itself can be reduced into *Set Cover*, all these problems are *NP-Complete*
