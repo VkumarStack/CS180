@@ -103,3 +103,56 @@
             - Add *(z̄<sub>i</sub> ∨ z<sub>3</sub> ∨ z<sub>4</sub>)*, *(z̄<sub>i</sub> ∨ z̄<sub>3</sub> ∨ z<sub>4</sub>)*, *(z̄<sub>i</sub> ∨ z<sub>3</sub> ∨ z̄<sub>4</sub>)*, and *(z̄<sub>i</sub> ∨ z̄<sub>3</sub> ∨ z̄<sub>4</sub>)* for *i = 1* and *i = 2*, which ensures that *z<sub>1</sub> = z<sub>2</sub> = 0* as otherwise all the clauses would not be satisfied
             - Clauses with only one term can have *z<sub>1</sub>* and *z<sub>2</sub>* added whereas clauses with two terms can have just *z<sub>1</sub>* added
     - Since *Circuit Satisfiability* can be reduced *3-SAT*, and *3-SAT* can be reduced into *Independent Set*, which can be reduced into *Vertex Cover*, which itself can be reduced into *Set Cover*, all these problems are *NP-Complete*
+## Sequencing Problems
+- The **Traveling Salesman Problem** and **Hamiltonian Cycle Problem** are both examples of problems that involve searching over all *permutations* over a collection of objects
+    - The Traveling Salesman Problem asks, given a set of distances on *n* cities, and a bound *D*, whether there is a tour (which visits all cities and then returns home) of length at most *D*
+    - The Hamiltonian Cycle asks, given a directed graph *D*, whether there is a cycle that visits each vertex exactly once
+- To prove that the Hamiltonian Cycle Problem is NP-Complete, it can be shown that 3-SAT can be reduced to Hamiltonian Cycle
+    - Consider an arbitrary instance of 3-SAT with variables *x<sub>1</sub>, ..., x<sub>n</sub>* and clauses *C<sub>1</sub>, ..., C<sub>k</sub>*
+    - A graph can be constructed such that it contains *2<sup>n</sup>* different Hamiltonian Cycles, corresponding to the *2<sup>n</sup>* possible assignments to the variables
+        - ![Hamiltonian Cycle 3 SAT Graph](../Images/Hamiltonian_Cycle_3_SAT.png)
+            - There are *n* paths *P<sub>1</sub>, ..., P<sub>n</sub>*, each corresponding to a truth variable 
+                - If a Hamiltonian Cycle traverses a path *P<sub>i</sub>* left to right, the corresponding variable *x<sub>i</sub>* should be set to 1 and otherwise it should be set to 0
+    - Clauses can be represented in this graph in terms of the aforementioned paths - i.e. *x<sub>1</sub> ∨ x̄<sub>2</sub> ∨ x<sub>3</sub>* requires that *P<sub>1</sub>* traverse left to right or *P<sub>2</sub>* traverse right to left, or *P<sub>3</sub>* traverse left to right
+        - ![Hamiltonian Cycle 3 SAT Clause](../Images/Hamiltonian_Cycle_3_SAT_Clause.png)
+            - An extra node is added for each clause
+    - If there is a satisfying 3-SAT instance, then there is a Hamiltonian Cycle in the corresponding graph
+        - Since each clause *C<sub>j</sub>* is satisfied by the assignment, there will be at least one path *P<sub>i</sub>* that is going in the correct direction relative to *c<sub>j</sub>*, allowing every vertex to be visited without any repetition
+    - If there is a Hamiltonian Cycle in the corresponding graph, then there is a satisfying 3-SAT instance
+        - If the cycle enters a clause node *c<sub>j</sub>*, then it must return to the same path that it departed from in the cycle, as otherwise it would not be able to finish traveling to all vertices on that path (this is assuming that the clause nodes are not spliced at the start or end of each path)
+        - The truth assignments are associated with the direction in which each path is traveled, as mentioned earlier, and the presence of a Hamiltonian Cycle implies the existence of assignments which satisfy each clause since the clause nodes are all reached in the cycle
+- The Hamiltonian Cycle Problem can be reduced to the Traveling Salesman Problem, showing that the latter is also NP-Complete
+    - Given a graph *G*, each vertex can be considered a city
+        - Two cities can be defined to have a distance of 1 if there is an edge between their corresponding cities on *G* - otherwise, they have a distance of 2
+    - If *G* has a Hamiltonian Cycle, then there is a tour of length *n*
+        - The tour can follow all vertices on the cycle, which results in a sum of *n*
+    - If there is a tour of length *n*, then *G* has a Hamiltonian Cycle
+        - The only way to get a length of *n* is to sum *n* terms of length 1, implying that all consecutive cities on the tour are connected by an edge on *G* - this implies a Hamiltonian Cycle
+- The Hamiltonian Path Problem is similar to the Hamiltonian Cycle Problem, and it is also NP-Complete 
+    - Given an instance of the Hamiltonian Cycle Problem on *G*, a new graph *G'* can be constructed by choosing an arbitrary node *v* and replacing it with two new nodes *v'* and *v''* such that all edges out of *v* are now out of *v'* and all edges into *v* are now into *v''*
+        - If *G* has a Hamiltonian Cycle starting and ending at *v*, then *G'* has a corresponding Hamiltonian Path starting at *v'* and ending at *v''*
+        - If *G'* has a Hamiltonian Path, then this path must begin at *v'* since it has no incoming edges and end at *v''* since it has no outgoing edge; this implies *G* has a Hamiltonian Cycle since *v'* and *v''* can be replaced with *v* to form an ordering that is a Hamiltonian Cycle in *G*
+## Graph Coloring
+- **Graph Coloring** problems involve an undirected graph *G* and seek to assign a color to each node of *G* such that if *(u, v)* is an edge, both *u* and *v* have different colors
+    - A *k-coloring* involves assigning colors from *{1, 2, ... k}* to each vertex
+- The Graph Coloring Problem asks, given a graph *G* and a bound *k*, whether *G* has a k-coloring
+- For *k = 2*, this problem is relatively simple - a graph *G* is 2-colorable if and only if it is bipartite, and this can be determined by running a breadth-first search in *O(m + n)* time
+- For *k = 3* and beyond, however, the coloring problem is NP-Complete; it can be shown that 3-SAT can be reduced to 3-Coloring (and 3-Coloring can be reduced to k-Coloring)
+    - Given an instance of 3-SAT, create a graph with nodes *v<sub>i</sub>* and *v̄<sub>i</sub>* corresponding to each variable *x<sub>i</sub>* and its negation
+    - Additionally, create three special nodes corresponding to *True*, *False*, and *Base* and connect them together in a triangle
+    - Each node *v* and its negation *v̄* should be connected to *Base*
+        - ![3-SAT 3-Coloring](../Images/3-SAT-3-Coloring.png)
+        - From this constructed graph, both *v* and *v̄* must be assigned different colors from each other and different from *Base*, and one will get a color corresponding to *True* and the other will get a color corresponding to *False*, representing a truth assignment
+    - For each clause, a six-node subgraph can be constructed in such a manner that a certain node can be colored only if the clause is satisfied
+        - This subgraph can be attached to the aforementioned graph
+        - Example: *x<sub>1</sub> ∨ x̄<sub>2</sub> ∨ x<sub>3</sub>*
+            - ![3-Sat 3-Coloring Clause](../Images/3-SAT-3-Coloring-Clause.png)
+                - If *v<sub>1</sub>*, *v̄<sub>2</sub>*, and *v<sub>3</sub>* all have the *False* coloring (whichever color *F* has), then it would mean that the topmost node would not be able to get a color
+                    - The lowest two shaded nodes would be assigned the *Base* color, forcing the next three highest nodes to get (from left to right) the *False*, *Base*, and *True* colors - this leaves no possible coloring for the topmost node
+    - If the constructed graph *G* has a 3-coloring, then this implies that the 3-SAT instance is satisfiable
+        - Each node *v<sub>i</sub>* is assigned either the *True* color or *False* color, which corresponds to the assignment for *x<sub>i</sub>*
+        - Due to how *G* was constructed, each clause corresponding to the attached subgraph must have at least one term that satisfies the entire clause as otherwise no coloring for that subgraph (and therefore the entirety of *G*) would be able to exist
+    - If the 3-SAT instance is satisfiable, then the constructed graph *G* has a 3-coloring
+        - *Base*, *True*, and *False* are all given arbitrary colors
+        - *v<sub>i</sub>* is assigned the *True* color if *x<sub>i</sub>* is assigned true and the *False* color otherwise; *v̄<sub>i</sub>* is assigned the remaining color
+        - A valid coloring will exist for the additional subgraphs only if their associated clauses are satisfiable, which is the case - so the entire graph will have a 3-coloring

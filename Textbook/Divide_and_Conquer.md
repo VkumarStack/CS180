@@ -7,7 +7,7 @@
     - *T(n) <= 2T(n/2) + O(n) = 2T(n/2) + cn*
         - *T(2) <= c* 
 - One approach to solving recurrences is to *unroll* the recursion and determine some sort of pattern
-    - ![Mergesort Unroll](./Images/Mergesort_Unroll.png)
+    - ![Mergesort Unroll](../Images/Mergesort_Unroll.png)
     - At level *j* of the recursion, the number of subproblems has doubled *j* times for a total of *2<sup>j</sup>*, but each problem has also correspondingly shrunk by a factor of *2<sup>j</sup>* for a size of *n/2<sup>j</sup>*
         - Thus, each level *j* contributes a total of at most *(2<sup>j</sup>)(cn/2<sup>j</sup>) = cn* running time 
         - At each level there is *cn* work, and the number of levels of recursion is simply *log<sub>2</sub>n* (since the input is getting halved each time) and therefore the running time is *O(nlogn)*
@@ -35,7 +35,7 @@
 - This problem can be brute-forced by looking at every single pair of numbers in the sequence, taking *O(n<sup>2</sup>)* time
 - A more efficient, *O(nlogn)* solution can be found using divide-and-conquer
     - The list can be divided into two pieces and the number of inversions *within each individual half* can be found and then added to the number of inversions *between each half*
-    - ![Inversion Count](./Images/Inversion_Count.png)
-    - ![Sort and Count](./Images/Sort_and_Count.png)
+    - ![Inversion Count](../Images/Inversion_Count.png)
+    - ![Sort and Count](../Images/Sort_and_Count.png)
         - In the merge step, if *B*'s current element *b<sub>j</sub>* is less than *A*'s current element *a<sub>i</sub>*, then it is clear that *b<sub>j</sub>* is also less than the rest of *A*'s elements (*a<sub>i</sub>* to *a<sub>n</sub>*) since *A* is sorted
             - This means that there are as many inversions as there are remaining elements in *A*
