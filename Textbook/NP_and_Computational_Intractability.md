@@ -132,6 +132,30 @@
     - Given an instance of the Hamiltonian Cycle Problem on *G*, a new graph *G'* can be constructed by choosing an arbitrary node *v* and replacing it with two new nodes *v'* and *v''* such that all edges out of *v* are now out of *v'* and all edges into *v* are now into *v''*
         - If *G* has a Hamiltonian Cycle starting and ending at *v*, then *G'* has a corresponding Hamiltonian Path starting at *v'* and ending at *v''*
         - If *G'* has a Hamiltonian Path, then this path must begin at *v'* since it has no incoming edges and end at *v''* since it has no outgoing edge; this implies *G* has a Hamiltonian Cycle since *v'* and *v''* can be replaced with *v* to form an ordering that is a Hamiltonian Cycle in *G*
+## Partitioning Problems
+- The **Three-Dimensional Matching Problem** is as follows: *Given disjoint sets X, Y, and Z, each of size n, and given a set T ⊆ X × Y × Z ordered triples, does there exist a set of n triples so that each element of X ∪ Y ∪ Z is contained in exactly one of these triples?*
+- It can be shown that 3-Dimensional Matching is NP-Complete by reducing 3-SAT to 3-Dimensional Matching
+    - Consider an arbitrary instance of 3-SAT with *n* variables and *k* clauses
+    - Each variable *x<sub>i</sub>* can be associated with a gadget, making use of elements *A<sub>i</sub> = {a<sub>i1</sub>, a<sub>i2</sub>, ..., a<sub>i,2k</sub>}* (core) and *B<sub>i</sub> = {b<sub>i1</sub>, b<sub>i2</sub>, ..., b<sub>i,2k</sub>}* (tip)
+        - For each *j* from *1, 2, ..., 2k*, a triple is defined as *t<sub>ij</sub> = (a<sub>ij</sub>, a<sub>i,j+1</sub>, b<sub>ij</sub>)*
+        - A triple is *even* if *j* is even and otherwise it is odd
+        - In a perfect matching, the only way for all elements in *A<sub>i</sub>* to be covered is to either use all even triples in gadget *i* or all odd triples in gadget *i*, as using both an odd and an even would ultimately result in the same element from *A* being used twice (due to the *j* and *j + 1* indexing)
+            - Using even triples leaves the odd tips of the gadget free whereas using odd triples leaves the even tips of the gadget free - this is analagous to the assignment of a truth value to a variable in a SAT instance - let true correspond to even tips being *free* and false correspond to odd tips being *free*
+        - Clauses can be thought of as constraining which tips on gadgets should be free - i.e. *x<sub>1</sub> ∨ x̄<sub>2</sub> ∨ x<sub>3</sub>* requires that the even tips be free for gadget 1, or the odd tips be free for gadget 2, or the even tips be free for gadget 3
+            - A *clause gadget* consists of two core elements *P<sub>j</sub> = {p<sub>j</sub>, p'<sub>j</sub>}* and three triples containing *P<sub>j</sub>* and a tip of the corresponding variable; if a term is *x<sub>i</sub>* then the triple would be *(p<sub>j</sub>, p'<sub>j</sub>, b<sub>i,2j</sub>)* and otherwise if a term is *x̄<sub>i</sub>* then the triple would be *(p<sub>j</sub>, p'<sub>j</sub>, b<sub>i,2j-1</sub>)*
+                - Clause gadgets will never "compete" with each other for the same triple since each gadget *2k*, where *k* is the number of clauses, triples - so there are as many clauses for each variable and its negation
+        - It may be the case that not all tips are covered, as there are *n·2k = 2nk* tips, and the triples cover *nk* of them while the clause gadgets covered *k* of them, leaving *(n - 1)k* tips uncovered
+            - Thus, *(n - 1)k* cleanup gadgets can be added to the instance, such that each gadget consists of two core elements *Q<sub>i</sub> = {q<sub>i</sub>, q'<sub>i</sub>}* and there is a triple *(q<sub>i</sub>, q'<sub>i</sub>, b)* for *every* tip *b* in each variable's gadget
+        - This construction can be partitioned into sets *X*, *Y*, and *Z* of equal size 
+            - *X* is the set of *a<sub>ij</sub>* with *j* even, the set of all *p<sub>j</sub>*, and the set of all *q<sub>i</sub>*
+            - *Y* is the set of *a<sub>ij</sub>* with *j* odd, the set of all *p'<sub>j</sub>*, and the set of all *q'<sub>i</sub>*
+            - *Z* is the set of all tips *b<sub>ij</sub>*
+    - If the 3-SAT instance is satisfiable, then the choice of odd or even can be made for each variable gadget based on the corresponding SAT variable 
+        - The clause gadgets should be able to be covered, and the cleanup gadgets can cover the remaining tips - this means that all elements are covered, implying a perfect matching
+    - If there is a perfect three-dimensional matching, then this implies a satisfiable 3-SAT instance since each variable assignment in the SAT instance can be made based off of the corresponding variable gadget's covering (odd or even)
+        - Since each clause gadget has been covered, this implies that each clause in the 3-SAT instance has been satisfied, thus implying a satisfying assignment
+    - ![3 Dimensional Matching](../Images/3_Dimensional_Matching.jpg)
+        - Notice how attempting to use both an even and odd triple results in double coverage, and notice how using only even or only odd triples results in full coverage for each gadget
 ## Graph Coloring
 - **Graph Coloring** problems involve an undirected graph *G* and seek to assign a color to each node of *G* such that if *(u, v)* is an edge, both *u* and *v* have different colors
     - A *k-coloring* involves assigning colors from *{1, 2, ... k}* to each vertex
