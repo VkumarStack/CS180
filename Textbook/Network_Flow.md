@@ -44,3 +44,23 @@
               Update f to be f'
               Update the residual graph Gf to be Gf'
             Return f
+## Maximum Flows and Minimum Cuts in a Network
+- A **cut** in a flow network is a division of nodes into two sets, *A* and *B*, such that *s ∈ A* and *t ∈ B*
+    - The *capacity* of a cut *(A, B)*, denoted as *c(A, B)* is the sum of all capacities out of *A*: *Σ<sub>e out of A</sub>c<sub>e</sub>*
+    - *f<sup> out</sup>(A) = f<sup> in</sup>(B)*
+    - *f<sup> in</sup>(A) = f<sup> out</sup>(B)*
+- It can be shown that for any *s-t* flow *f*, and any *s-t* cut *(A, B)*, that *v(f) = f<sup> out</sup>(A) - f<sup> in</sup>(A)* - the flow of a network can be measured by the amount that exits *A* minus the amount that enters back into *A*
+    - This can be proven using the fact that *v(f) = f<sup> out</sup>(s)* and *f<sup> in</sup>(s) = 0* and for any node in *A* other than *s*, *f<sup>out</sup>(v) - f<sup>in</sup>(v) = 0*, so:
+        - $v(f) = \sum\limits_{v\in A}(f^{out}(v) - f^{in}(v))$
+        - $\sum\limits_{v\in A}(f^{out}(v) - f^{in}(v)) = \sum\limits_{e\ out\  of \  A}f(e) - \sum\limits_{e \ into \ A}f(e) = f^{out}(A) - f^{in}(A)$
+- If *f* is any *s-t flow* and *(A, B)* is any cut, then *v(f) ≤ c(A, B)*; the value of every flow is upper bounded by the capacity of every cut
+    - $v(f) = f^{out}(A) - f^{in}(A) \leq f^{out}(A) = \sum\limits_{e \ out \ of \ A}f(e) \leq \sum\limits_{e \ out \ of \ A}c_e = c(A, B)$
+    - Since the value of every flow is bounded by the capacity of every cut, if some minimum cut *c\** is found, then this minimum cut will correspond to a maximum flow
+- The Ford-Fulkerson Algorithm terminates when the flow *f* has no *s-t* path in the residual graph *G<sub>f</sub>* - this can be used to show that there is an *s-t* cut *(A\*, B\*)* such that *v(f) = c(A\*, B\*)* and that this cut has the minimum capacity of any *s-t* cut in *G* (and therefore *f* has the maximum value of any in flow in *G*)
+    - Let *A\** denote all nodes in *G* in which there is an *s-v* path in *G<sub>f</sub>* and *B\** denote *V - A\**
+    - Consider *e = (u, v)* in *G*, where *u ∈ A\** and *v ∈ B\**; it *must* be the case that *f(e) = c<sub>e</sub>* as otherwise *e* would be a forward edge in the residual graph, implying a *s-v* path which would contradict the assumption that *v ∈ B\**
+    - Consider *e' = (u', v')* in *G*, where *u' ∈ B\** and *v' ∈ A\**; it *must* be the case that *f(e') = 0* as otherwise there would be a backward edge in the residual graph, implying a *s-u'* path which would contradict the assumption that *u' ∈ B\**
+    - $v(f) = f^{out}(A^{*}) - f^{in}(A^{*}) = \sum\limits_{e \ out \ of \ A^{*}}c_e - 0 = c(A^{*}, B^{*})$
+    - ![Maximum Flow Minimum Cut](../Images/Maximum_Flow_Minimum_Cut.jpg)
+- If all capacities in a flow network are integers, then there is a maximum flow *f* for which every flow value *f(e)* is an integer
+    - If capacities were non-integer values, it is possible for the Ford-Fulkerson Algorithm to loop infinitely, as there could be cases where the value of the flow keeps increasing but in smaller and smaller increments
