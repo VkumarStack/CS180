@@ -44,6 +44,12 @@
               Update f to be f'
               Update the residual graph Gf to be Gf'
             Return f
+- At every stage of the Ford-Fulkerson Algorithm, the flow values and residual capacities are *integers* - this is because all edge capacities are integers, and so all residual capacities will also be integers
+    - This fact can be used to show that the algorithm eventually terminates: *Let f be a flow in G, and let P be a simple s-t path in G<sub>f</sub>. Then v(f') = v(f) + bottleneck(P, f); and since bottleneck(P, f) > 0, it is the case that v(f') > v(f)*
+    - An upper bound on the maximum flow value can be established as the sum of capacities for edges out of *s*, denoted as *C*
+        - The Ford-Fulkerson Algorithm terminates in at most *C* iterations of the loop, since the value of the flow could, in the worst case, increase by 1 for *C* times until the upper bound is reached
+- During each iteration of the algorithm, it takes *O(m + n) = O(m)* time to find an *s-t* path in *G<sub>f</sub>* (since each vertex has at least one edge, so there are more edges that vertices), *O(n)* time to perform an augmentation, and *O(m)* time to build a new residual graph
+    - Each iteration can be bounded by *O(m)*, and since there can be at most *C* iterations, the algorithm is bounded by *O(mC)* time
 ## Maximum Flows and Minimum Cuts in a Network
 - A **cut** in a flow network is a division of nodes into two sets, *A* and *B*, such that *s ∈ A* and *t ∈ B*
     - The *capacity* of a cut *(A, B)*, denoted as *c(A, B)* is the sum of all capacities out of *A*: *Σ<sub>e out of A</sub>c<sub>e</sub>*
@@ -64,3 +70,31 @@
     - ![Maximum Flow Minimum Cut](../Images/Maximum_Flow_Minimum_Cut.jpg)
 - If all capacities in a flow network are integers, then there is a maximum flow *f* for which every flow value *f(e)* is an integer
     - If capacities were non-integer values, it is possible for the Ford-Fulkerson Algorithm to loop infinitely, as there could be cases where the value of the flow keeps increasing but in smaller and smaller increments
+## Choosing Good Augmenting Paths
+- For large values of *C*, the upper bound of *O(mC)* on the Ford-Fulkerson Algorithm can result in slow performance
+    - ![Ford Fulkerson Slow Performance](../Images/Ford_Fulkerson_Slow_Case.jpg)
+        - The maximum flow is 200, and it could be easily found by pushing 100 units of flow through the top path and then 100 units of flow through the bottom path
+        - However, it could be the case that an algorithm keeps choosing a *s-t* path in the residual graph where the bottleneck is 1, resulting in the flow value incrementing by 1 each time for 200 iterations
+- One way to optimize the Ford-Fulkerson Algorithm is to maintain a scaling parameter Δ and looking for paths that have a bottleneck capacity of at least Δ; *G<sub>f</sub>(Δ)* is the subset of the residual graph containing edges with residual capacity at least Δ
+    -     Scaling Max-Flow
+            Initially f(e) = 0 for all e in G
+            Initially set Δ to be the largest power of 2 that is no larger than the maximum capacity out of s
+            While Δ >= 1
+                While there is an s-t path in the graph Gf(Δ)
+                  Let P be a simple s-t path Gf(Δ)
+                  f' = augment(f, P)
+                  Update f to be f' and update Gf(Δ)
+                Δ = Δ/2
+            Return f
+- The initial value of Δ is C and then it drops by factors of 2, so the number of iterations of the outer while loop is at most $1 + \lceil log_2C \rceil$
+    - During each Δ-scaling phase (iteration of the outermost loop), each augmentation increases the flow value by at least Δ
+    - If *f* is the flow at the end of the Δ-scaling phase, then there is an *s-t* cut *(A, B)* in *G* where *c(A, B) ≤ v(f) + mΔ*, implying that the maximum flow in the network has a value of at most *v(f) + mΔ*   
+        - Let *A* be the set of nodes *v* in *G* for where there is an *s-v* path in *G<sub>f</sub>(Δ)* and *B* be *V - A*
+            - If there is an edge *e = (u, v)* where *u* is in *A* and *v* is in *B*, then *c<sub>e</sub> < f(e) + Δ* as otherwise *e* would be a forward edge in *G<sub>f</sub>(Δ)*, which contradicts *v* being in *B*
+            - If there is an edge *e' = (u', v')* where *u'* is in *B* and *v'* is in *A*, then *f(e') < Δ* as otherwise *e'* would be a backward edge in *G<sub>f</sub>(Δ)*, which contradicts *u'* being in *B*
+            - ![Scaling Factor Proof](../Images/Scaling_Phase_Proof.jpg)
+    - The number of augmentations in a scaling phase is at most *2m*
+        - Let *f<sub>p</sub>* be the flow at the end of the previous phase, with Δ' = 2Δ as the parameter (Δ is the current phase's scaling factor)
+        - *v(f\*) ≤ v(f<sub>p</sub>) + mΔ' = v(f<sub>p</sub>) + 2mΔ*
+        - Each augmentation changes the flow by at least Δ, and by the inequality there can be at most *2m* augmentations
+- The Scaling Max-Flow Algorithm runs in at most *O(m<sup>2</sup>log<sub>2</sub>C)* time since the outermost while loop runs in *O(log<sub>2</sub>C)* time and there are *2m* augmentations in each scaling phase, each of which take *O(m)* time
