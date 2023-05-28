@@ -66,7 +66,7 @@
     - Let *A\** denote all nodes in *G* in which there is an *s-v* path in *G<sub>f</sub>* and *B\** denote *V - A\**
     - Consider *e = (u, v)* in *G*, where *u ∈ A\** and *v ∈ B\**; it *must* be the case that *f(e) = c<sub>e</sub>* as otherwise *e* would be a forward edge in the residual graph, implying a *s-v* path which would contradict the assumption that *v ∈ B\**
     - Consider *e' = (u', v')* in *G*, where *u' ∈ B\** and *v' ∈ A\**; it *must* be the case that *f(e') = 0* as otherwise there would be a backward edge in the residual graph, implying a *s-u'* path which would contradict the assumption that *u' ∈ B\**
-    - $v(f) = f^{out}(A^{*}) - f^{in}(A^{*}) = \sum\limits_{e \ out \ of \ A^{*}}c_e - 0 = c(A^{*}, B^{*})$
+    - $v(f) = f^{out}(A^{\*}) - f^{in}(A^{\*}) = \sum\limits_{e \ out \ of \ A^{\*}}c_e - 0 = c(A^{\*}, B^{\*})$
     - ![Maximum Flow Minimum Cut](../Images/Maximum_Flow_Minimum_Cut.jpg)
 - If all capacities in a flow network are integers, then there is a maximum flow *f* for which every flow value *f(e)* is an integer
     - If capacities were non-integer values, it is possible for the Ford-Fulkerson Algorithm to loop infinitely, as there could be cases where the value of the flow keeps increasing but in smaller and smaller increments
