@@ -124,3 +124,28 @@
     - ![Preflow Relabel](../Images/Preflow_Relabel.png)
 - ![Preflow Push Algorithm](../Images/Preflow_Push_Algorithm.png)
     - The generic algorithm runs in *O(n<sup>2</sup>m)* and an optimized version where the node at maximum height is selected runs in *O(n<sup>3</sup>)* time
+## Bipartite Matching
+- Given a bipartite graph *G* that can be partitioned into *V* and *X*, a **matching** is a subset of edges *M* such that each node appears in at most one edge in *M*
+- The Bipartite Matching problem involves finding the largest matching in *G*
+- This problem can be solved readily by converting it into an instance of the Maximum-Flow Problem
+- First, construct the network *G'* from the original graph *G*
+    - Add a source node *s* and add a directed edge *(s, x)* from *s* to each node *x* in *X*
+    - Direct all edges from *X* to *Y*
+    - Add a sink node *t* and add a directed edge *(y, t)* from each node *y* in *Y* to *t*
+    - Give each edge in this constructed flow network a capacity of 1
+- The maximumm *s-t* flow in this network *G'* will be equal to the size of the maximum matching, and all edges with flow through them will be part of the matching set *M*
+    - This intuitively makes sense given that each edge has a capacity of 1 - so each vertex can only match with only one other vertex, which fits with the definition of a matching
+        - Since the *maximum flow* is being found, this correlates to a *maximum sized matching*
+    - The Ford-Fulkerson Algorithm can be used to find the maximum flow, and since it is bounded by *O(mC)*, where *C* is the sum of capacities leaving *s*, it can be shown that the algorithm runs in *O(mn)* time since the sum of capacities leaving *s* is simply the number of nodes in *X*, or *|X|*
+## Disjoint Paths in Directed and Undirected Graphs
+- A set of paths is **edge-disjoint** if their edge sets are disjoint (though they may go through the same *nodes*)
+- The Directed Edge-Disjoint Paths and Undirected Edge-Disjoint Paths problem seeks to find the maximum number of edge-disjoint *s-t* paths in a directed or undirected graph *G*
+- This problem can also be readily converted into an instance of the Maximum-Flow Problem
+    - Let the source point *s* be the source node and the end point *t* be the sink node
+    - For a directed graph, assign a capacity of 1 to any edge *e* that is on an *s-t* path and assign a capacity of 0 to all other edges
+    - For an undirected graph, each edge *(u, v)*in the original graph *G* should be replaced with two directed edges *(u, v)* and *(v, u)*
+- If there exists *k* edge-disjoint paths in the graph *G*, then the maximum *s-t* flow in the constructed flow network *G'* is *k*
+    - A flow starting from *s* must eventually reach *t*, and since each edge along the path has a capacity of 1, it cannot be the case that multiple paths use the same edge given the capacity conditions
+    - The bound on this one is the same as in bipartite matching, with a bound of *O(mn)*
+- To find **node-disjoint** paths, the same approach can be used but each vertex *v* can be split into two vertices - *v'* and *v''*, where all incoming edges to *v* are routed to *v'* and all outgoing edges from *v* are routed from *v''*
+    - *v'* and *v''* should share a single edge with capacity of 1, which ensures that any path going through *v* can only go through it once (due to the capacity)
