@@ -98,3 +98,29 @@
         - *v(f\*) ≤ v(f<sub>p</sub>) + mΔ' = v(f<sub>p</sub>) + 2mΔ*
         - Each augmentation changes the flow by at least Δ, and by the inequality there can be at most *2m* augmentations
 - The Scaling Max-Flow Algorithm runs in at most *O(m<sup>2</sup>log<sub>2</sub>C)* time since the outermost while loop runs in *O(log<sub>2</sub>C)* time and there are *2m* augmentations in each scaling phase, each of which take *O(m)* time
+## Preflow-Push Algorithm
+- Another algorithm for finding the maximum flow on a network is the **Preflow-Push Algorithm** which, instead of using augmenting paths, increases flow on an edge-by-edge basis
+- An *s-t* preflow is a function *f* that maps each edge *e* to a nonnegative real number
+    - Preflows must match capacity conditions: *0 <= f(e) <= c<sub>e</sub>* for each *e*
+    - Preflows do not need to meet conservation conditions - instead, each node other than *s* must have at least as much flow entering as leaving: $\sum\limits_{e \; into \; v}f(e)\geq\sum\limits_{e \; out \; of \; v}f(e)$
+        - Let $e_f(v) =\sum\limits_{e \; into \; v}f(e)-\sum\limits_{e \; out \; of \; v}f(e)$ be the *excess* preflow at *v*
+- The Preflow-Push Algorithm is based on the intuition that flow finds its way "downhill" and correspondingly maintains labels *h(v)* for each node *v* such that flow is pushed from nodes with higher labels to nodes with lower labels
+- A labelling *h* and a preflow *f* are compatible if:
+    - Source and Sink: *h(t) = 0* and *h(s) = n*
+    - Steepness: For edges *(v, w)* in *E<sub>f</sub>* (residual graph), *h(v) <= h(w) + 1*
+- In a compatible preflow and labeling, there can be no *s-t* path in the residual graph
+    - Let *P* be a simple *s-t* path in the residual graph *G*, with nodes *s*, *v<sub>1</sub>*, ..., *v<sub>k</sub> = t* and *f* be a compatible preflow with labelling *h*
+        - Since the labeling is compatible, *h(s) = n*
+        - Since *s* and *v<sub>1</sub>* are part of the path, *(s, v<sub>1</sub>)* is an edge, so *h(v<sub>1</sub>) >= h(s) - 1 = n - 1* (steepness)
+        - Inductively, for each edge *(v<sub>i - 1</sub>, v<sub>i</sub>)*, it must be the case that *h(v<sub>i</sub>) >= n - i*
+        - However, the last node of the path is *t*, indicating that *h(t) >= n - k* - *k < n* since the path is simple and, for the flabeling and flow to be compatible, it must be the case that *h(t) = 0*, which is a contradiction
+    - What this means, then, is if an *s-t* flow *f* is compatible with a labeling *h*, then *f* is a flow of maximum value
+- The Preflow-Push Algorithm effectively maintains a compatible labeling and preflow and then gradually transforms transforms the preflow *f* into an actual feasible flow
+    - It starts with *h(v) = 0* for all *v* **except *s*** and sets *h(s) = n* as an initial labeling
+    - A preflow compatible with this labeling is one that ensures no edges leaving *s* are in the residual graph (which satisfies the steepness condition), which can be done by defining an initial preflow *f(e) = c<sub>e</sub>* for all edges *(s, v)* leaving the source and *f(e) = 0* for all other edges
+- The **push** operation will, for a node *v* that has an excess, push some of its excess flow to a node with lower height *w*
+    - ![Preflow Push](../Images/Preflow_Push.png)
+- The **relabel** operation raises the height of node *v* if the excess of *v* cannot be pushed along any edge leaving it
+    - ![Preflow Relabel](../Images/Preflow_Relabel.png)
+- ![Preflow Push Algorithm](../Images/Preflow_Push_Algorithm.png)
+    - The generic algorithm runs in *O(n<sup>2</sup>m)* and an optimized version where the node at maximum height is selected runs in *O(n<sup>3</sup>)* time
