@@ -63,7 +63,7 @@
         - *A* has a *polynomial running time* if there is a polynomial function *p()* such that for every *s*, *A* is bounded by *O(p(|s|))*
         - 𝒫 is the set of all problems *X* for which there exists an algorithm *A* with polynomial running time that solves *X*
 ### Efficient Certification
-- An algorithm *B* is an *efficient certifier* for a problem *X* if it is a polynomial-time algorithm that takes the problem input *s* and a certificate string *t* and there is a polynomial function *p* so that for every string *s*, *s* is in *X* if and only if there exists a string *t* such that *|t| <= p(s)* and *B(s, t)*
+- An algorithm *B* is an *efficient certifier* for a problem *X* if it is a polynomial-time algorithm that takes the problem input *s* and a certificate string *t* and there is a polynomial function *p* so that for every string *s*, *s* is in *X* if and only if there exists a string *t* such that *|t| <= p(s)* and *B(s, t)=yes*
     - *B* effectively tries to evaluate the proof *t* that *s* belongs to *X*, as long as *t* is not too long 
 ### NP: A Class of Problems
 - 𝒩𝒫 is the set of all problems for which an efficient certifier exists, and it can be observed that **𝒫 ⊆ 𝒩𝒫**, since, if a polynomial-time algorithm to solve a problem exists, the certifier can simply output the result of that algorithm
